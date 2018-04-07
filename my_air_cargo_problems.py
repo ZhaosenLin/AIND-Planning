@@ -65,11 +65,8 @@ class AirCargoProblem(Problem):
                 for p in self.planes:
                     for c in self.cargos:
                         pre_cond = [[expr('At({},{})'.format(c, a)),
-                                     expr('At({},{})'.format(p, a)),
-                                     expr('Cargo({})'.format(a)),
-                                     expr('Plane({})'.format(p)),
-                                     expr('Airport({})'.format(a))], []]
-                        effect = [[expr('At({},{})'.format(c, p))], [expr('At({},{})'.format(c, a))]]
+                                     expr('At({},{})'.format(p, a))], []]
+                        effect = [[expr('In({},{})'.format(c, p))], [expr('At({},{})'.format(c, a))]]
                         load = Action(expr('Load({},{},{})'.format(c, p, a)), pre_cond, effect)
                         loads.append(load)
 
@@ -86,11 +83,10 @@ class AirCargoProblem(Problem):
             for a in self.airports:
                 for p in self.planes:
                     for c in self.cargos:
-                        pre_cond = [[expr('In({},{})'.format(c, p)), expr('At({},{})'.format(p, a)),
-                                     expr('Cargo({})'.format(c)), expr('Plane({})'.format(p)),
-                                     expr('Airport({})'.format(a))], []]
-                        effect = [[expr('At({},{})'.format(p, a))], [expr('In({},{})'.format(c, p))]]
-                        unload = Action(expr('Unload(c,p,a)'), pre_cond, effect)
+                        pre_cond = [[expr('In({},{})'.format(c, p)),
+                                     expr('At({},{})'.format(p, a))], []]
+                        effect = [[expr('At({},{})'.format(c, a))], [expr('In({},{})'.format(c, p))]]
+                        unload = Action(expr('Unload({},{},{})'.format(c, p, a)), pre_cond, effect)
                         unloads.append(unload)
             return unloads
 
@@ -243,16 +239,8 @@ def air_cargo_p2() -> AirCargoProblem:
            expr('At(C3,ATL)'),
            expr('At(P1,SFO)'),
            expr('At(P2,JFK)'),
-           expr('At(P3,ATL)'),
-           expr('Cargo(C1)'),
-           expr('Cargo(C2)'),
-           expr('Cargo(C3)'),
-           expr('Plane(P1)'),
-           expr('Plane(P2)'),
-           expr('Plane(P3)'),
-           expr('Airport(JFK)'),
-           expr('Airport(SFO)'),
-           expr('Airport(ATL)')]
+           expr('At(P3,ATL)')
+           ]
     neg = [expr('At(C1,JFK)'),
            expr('At(C1,ATL)'),
            expr('At(C2,SFO)'),
@@ -265,6 +253,15 @@ def air_cargo_p2() -> AirCargoProblem:
            expr('At(P2,SFO)'),
            expr('At(P3,SFO)'),
            expr('At(P3,JFK)'),
+           expr('In(C1,P1)'),
+           expr('In(C1,P2)'),
+           expr('In(C1,P3)'),
+           expr('In(C2,P1)'),
+           expr('In(C2,P2)'),
+           expr('In(C2,P3)'),
+           expr('In(C3,P1)'),
+           expr('In(C3,P2)'),
+           expr('In(C3,P3)')
            ]
     init = FluentState(pos, neg)
     goal = [expr('At(C1,JFK)'),
@@ -276,23 +273,13 @@ def air_cargo_p2() -> AirCargoProblem:
 def air_cargo_p3() -> AirCargoProblem:
     cargos = ['C1', 'C2', 'C3', 'C4']
     planes = ['P1', 'P2']
-    airports = ['SFO', 'JFK', 'ATL']
+    airports = ['SFO', 'JFK', 'ATL', 'ORD']
     pos = [expr('At(C1,SFO)'),
            expr('At(C2,JFK)'),
            expr('At(C3,ATL)'),
            expr('At(C4,ORD)'),
            expr('At(P1,SFO)'),
-           expr('At(P2,JFK)'),
-           expr('Cargo(C1)'),
-           expr('Cargo(C2)'),
-           expr('Cargo(C3)'),
-           expr('Cargo(C4)'),
-           expr('Plane(P1)'),
-           expr('Plane(P2)'),
-           expr('Airport(JFK)'),
-           expr('Airport(SFO)'),
-           expr('Airport(ATL)'),
-           expr('Airport(ORD)')]
+           expr('At(P2,JFK)')]
     neg = [expr('At(C1,JFK)'),
            expr('At(C1,ATL)'),
            expr('At(C1,ORD)'),
@@ -306,9 +293,19 @@ def air_cargo_p3() -> AirCargoProblem:
            expr('At(C4,JFK)'),
            expr('At(C4,ATL)'),
            expr('At(P1,JFK)'),
-           expr('At(P1,ALT)'),
+           expr('At(P1,ATL)'),
+           expr('At(P1,ORD)'),
            expr('At(P2,ALT)'),
-           expr('At(P2,SFO)')
+           expr('At(P2,ORD)'),
+           expr('At(P2,SFO)'),
+           expr('In(C1,P1)'),
+           expr('In(C1,P2)'),
+           expr('In(C2,P1)'),
+           expr('In(C2,P2)'),
+           expr('In(C3,P1)'),
+           expr('In(C3,P2)'),
+           expr('In(C4,P1)'),
+           expr('In(C4,P2)')
            ]
     init = FluentState(pos, neg)
     goal = [expr('At(C1,JFK)'),
